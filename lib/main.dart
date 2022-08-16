@@ -1,11 +1,15 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:login_app/database/authentication.dart';
 import 'package:login_app/screens/login_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  dynamic firebase = await Firebase.initializeApp();
-  print("Firebase.initializeApp data: ${firebase}");
+
+  // dynamic firebase = await Firebase.initializeApp();
+  dynamic firebase = await Authentication.initializeFirebase();
+
+  print("Authentication.initializeFirebase(): ${firebase}");
   runApp(const MyApp());
 }
 

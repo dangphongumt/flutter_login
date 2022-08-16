@@ -1,9 +1,15 @@
+import 'dart:math';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:login_app/database/authentication.dart';
+import 'package:login_app/screens/forgot_password_screen.dart';
+import 'package:login_app/screens/main_screen.dart';
+import 'package:login_app/screens/sign_up_screen.dart';
 import 'package:login_app/utilities/constants.dart';
 
 //https://www.youtube.com/watch?v=6kaEbTfb444
@@ -16,6 +22,8 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  get user => _auth.currentUser;
   bool _rememberMe = false;
 
   Widget _buildEmailTF(dynamic textController) {
@@ -108,6 +116,12 @@ class _LoginScreenState extends State<LoginScreen> {
               primary: Colors.white),
           onPressed: () {
             print("Forgot password button pressed!!!!!!!!!!!!!!!!!");
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const ForgotPasswordScreen(),
+              ),
+            );
           },
           child: const Text("Forgot Password?")),
     );
@@ -141,7 +155,8 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildLoginBtn() {
+  Widget _buildLoginBtn(
+      TextEditingController email, TextEditingController password) {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 25.0),
       width: double.infinity, //kéo chiều ngang
@@ -160,7 +175,8 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
 
         onPressed: () {
-          print("Login button pressed!!!!");
+          // print("Login button pressed!!!!");
+          signIn(email: email.text, password: password.text);
         },
         child: const Text(
           "LOGIN",
@@ -238,28 +254,34 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Widget _buildSignUpBtn(TextEditingController email,
-      TextEditingController password, bool showSpinner, dynamic auth) {
+      TextEditingController password, bool showSpinner) {
     return GestureDetector(
       // onTap: () => print("Sign up button pressed!!"),
       onTap: () async {
-        setState(() {
-          showSpinner = true;
-        });
-        try {
-          print("createUserWithEmailAndPassword - start");
-          final newUser = await auth.createUserWithEmailAndPassword(
-              email: email.text, password: password.text);
-          if (newUser != null) {
-            print("Sign up successfully!!!!!!!");
-            // Navigator.pushNamed(context, 'home_screen');
-          }
-        } catch (e) {
-          print(e);
-        }
-        setState(() {
-          showSpinner = false;
-        });
-        print("Sign up button data: ${email.text} - ${password}");
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => SignUpScreen(auth: _auth),
+          ),
+        );
+        // setState(() {
+        //   showSpinner = true;
+        // });
+        // try {
+        //   print("createUserWithEmailAndPassword - start");
+        //   final newUser = await _auth.createUserWithEmailAndPassword(
+        //       email: email.text, password: password.text);
+        //   if (newUser != null) {
+        //     print("Sign up successfully!!!!!!!");
+        //     // Navigator.pushNamed(context, 'home_screen');
+        //   }
+        // } catch (e) {
+        //   print(e);
+        // }
+        // setState(() {
+        //   showSpinner = false;
+        // });
+        print("Sign up button data: ${email.text} - ${password.text}");
       },
       child: RichText(
         text: const TextSpan(children: [
@@ -284,14 +306,57 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
+  // final FirebaseAuth _auth = FirebaseAuth.instance;
+  //   get user => _auth.currentUser;
+
+  //SIGN UP METHOD
+  //Future signUp({required String email, required String password}) async {
+  // try {
+  //   await _auth.createUserWithEmailAndPassword(
+  //     email: email,
+  //     password: password,
+  //   );
+  //   return null;
+  // } on FirebaseAuthException catch (e) {
+  //   return e.message;
+  // }
+  //}
+
+  //SIGN IN METHOD
+  Future signIn({required String email, required String password}) async {
+    print("signIn - start ");
+    if (user != null) {
+      print("signIn method found a currentUser: ${user} ");
+      // print("object")
+      signOut();
+    }
+    try {
+      dynamic user = await _auth.signInWithEmailAndPassword(
+          email: email, password: password);
+      print("user signIn: ${user}");
+      return null;
+    } on FirebaseAuthException catch (e) {
+      return e.message;
+    }
+  }
+
+  //SIGN OUT METHOD
+  Future signOut() async {
+    print("signOut- start ");
+    await _auth.signOut();
+
+    print('signout');
+  }
+
   @override
   Widget build(BuildContext context) {
     // dynamic firebase = Firebase.initializeApp();
     // print("Firebase.initializeApp data: ${firebase}");
     TextEditingController emailController = TextEditingController();
     TextEditingController passwordController = TextEditingController();
-    final FirebaseAuth _auth = FirebaseAuth.instance;
-    print("Current user: ${_auth.currentUser}");
+    // final FirebaseAuth _auth = FirebaseAuth.instance;
+    print("LoginScreen - Start");
+    print("Current user build: ${_auth.currentUser}");
     String email;
     String password;
     bool showSpinner = false;
@@ -299,6 +364,7 @@ class _LoginScreenState extends State<LoginScreen> {
       body: AnnotatedRegion<SystemUiOverlayStyle>(
         value: SystemUiOverlayStyle.light,
         child: GestureDetector(
+          //phat hien cu chi
           onTap: () => FocusScope.of(context).unfocus(),
           child: Stack(
             children: [
@@ -348,11 +414,74 @@ class _LoginScreenState extends State<LoginScreen> {
                       _buildPasswordTF(passwordController),
                       _buildForgotPasswordBtn(),
                       _buildRememberMeCheckbox(),
-                      _buildLoginBtn(),
+                      _buildLoginBtn(emailController, passwordController),
                       _buildSignInWithText(),
-                      _buildSocialBtnRow(),
-                      _buildSignUpBtn(emailController, passwordController,
-                          showSpinner, _auth),
+                      //_buildSocialBtnRow(),
+
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 30.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            _buildSocialBtn(
+                                () => print("Login with Facebook!!!!!"),
+                                AssetImage('assets/logos/facebook.jpg')),
+                            GestureDetector(
+                              onTap: () async {
+                                print("Login with Googlge!!!!!");
+                                // setState(() {
+                                //   _isSigningIn = true;
+                                // });
+
+                                User? user =
+                                    await Authentication.signInWithGoogle(
+                                        auth: _auth, context: context);
+
+                                // setState(() {
+                                //   _isSigningIn = false;
+                                // });
+
+                                if (user != null) {
+                                  print(
+                                      "Login with Googlge successfully: ${user}");
+                                  Navigator.of(context).pushReplacement(
+                                    MaterialPageRoute(
+                                      builder: (context) => MainScreen(
+                                          // user: user,
+                                          ),
+                                    ),
+                                  );
+                                } else {
+                                  print("Login with google fail");
+                                }
+                              },
+                              child: Container(
+                                height: 60.0,
+                                width: 60.0,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.white,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black26,
+                                      offset: Offset(0, 2),
+                                      blurRadius: 6.0,
+                                    ),
+                                  ], //bóng mờ phía sau hình
+
+                                  image: DecorationImage(
+                                    image:
+                                        AssetImage('assets/logos/google.jpg'),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      _buildSignUpBtn(
+                          emailController, passwordController, showSpinner),
                     ],
                   ),
                 ),
