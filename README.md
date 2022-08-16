@@ -48,3 +48,25 @@ Warning:
 The JKS keystore uses a proprietary format. It is recommended to migrate to PKCS12 which is an industry standard format using "keytool -importkeystore -srckeystore C:\Users\phong.dang\.android\debug.keystore -destkeystore C:\Users\phong.dang\.android\debug.keystore -deststoretype pkcs12".
 
 C:\Program Files\Java\jdk1.8.0_211\bin> -->
+
+<!-- dangphong@Dangs-MacBook-Pro android % keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android -keypass android
+
+Alias name: androiddebugkey
+Creation date: Jul 13, 2022
+Entry type: PrivateKeyEntry
+Certificate chain length: 1
+Certificate[1]:
+Owner: C=US, O=Android, CN=Android Debug
+Issuer: C=US, O=Android, CN=Android Debug
+Serial number: 1
+Valid from: Wed Jul 13 07:42:31 ICT 2022 until: Fri Jul 05 07:42:31 ICT 2052
+Certificate fingerprints:
+         SHA1: A5:98:D5:66:01:42:ED:AE:F9:31:9D:88:F9:BF:04:66:EB:56:2E:C8
+         SHA256: D2:C6:61:EE:D0:DB:58:49:29:A9:D6:D1:72:62:00:D8:BA:BA:A4:52:33:9C:50:32:B5:B3:1A:79:09:08:20:6F
+Signature algorithm name: SHA1withRSA (weak)
+Subject Public Key Algorithm: 2048-bit RSA key
+Version: 1
+
+Warning:
+The certificate uses the SHA1withRSA signature algorithm which is considered a security risk. This algorithm will be disabled in a future update.
+dangphong@Dangs-MacBook-Pro android %  -->
