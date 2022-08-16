@@ -1,3 +1,5 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -16,7 +18,7 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   bool _rememberMe = false;
 
-  Widget _buildEmailTF() {
+  Widget _buildEmailTF(dynamic textController) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -32,6 +34,7 @@ class _LoginScreenState extends State<LoginScreen> {
           decoration: kBoxDecorationStyle,
           height: 60.0,
           child: TextField(
+            controller: textController,
             keyboardType: TextInputType.emailAddress,
             style: TextStyle(
               color: Colors.white,
@@ -53,7 +56,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildPasswordTF() {
+  Widget _buildPasswordTF(dynamic textController) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -69,6 +72,7 @@ class _LoginScreenState extends State<LoginScreen> {
           decoration: kBoxDecorationStyle,
           height: 60.0,
           child: TextField(
+            controller: textController,
             obscureText: true,
             // keyboardType: TextInputType.emailAddress,
             style: TextStyle(
@@ -233,11 +237,32 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildSignUpBtn() {
+  Widget _buildSignUpBtn(TextEditingController email,
+      TextEditingController password, bool showSpinner, dynamic auth) {
     return GestureDetector(
-      onTap: () => print("Sign up button pressed!!"),
+      // onTap: () => print("Sign up button pressed!!"),
+      onTap: () async {
+        setState(() {
+          showSpinner = true;
+        });
+        try {
+          print("createUserWithEmailAndPassword - start");
+          final newUser = await auth.createUserWithEmailAndPassword(
+              email: email.text, password: password.text);
+          if (newUser != null) {
+            print("Sign up successfully!!!!!!!");
+            // Navigator.pushNamed(context, 'home_screen');
+          }
+        } catch (e) {
+          print(e);
+        }
+        setState(() {
+          showSpinner = false;
+        });
+        print("Sign up button data: ${email.text} - ${password}");
+      },
       child: RichText(
-        text: TextSpan(children: [
+        text: const TextSpan(children: [
           TextSpan(
             text: "Don't have an Account?",
             style: TextStyle(
@@ -261,6 +286,15 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // dynamic firebase = Firebase.initializeApp();
+    // print("Firebase.initializeApp data: ${firebase}");
+    TextEditingController emailController = TextEditingController();
+    TextEditingController passwordController = TextEditingController();
+    final FirebaseAuth _auth = FirebaseAuth.instance;
+    print("Current user: ${_auth.currentUser}");
+    String email;
+    String password;
+    bool showSpinner = false;
     return Scaffold(
       body: AnnotatedRegion<SystemUiOverlayStyle>(
         value: SystemUiOverlayStyle.light,
@@ -271,7 +305,7 @@ class _LoginScreenState extends State<LoginScreen> {
               Container(
                 height: double.infinity,
                 width: double.infinity,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
@@ -289,14 +323,14 @@ class _LoginScreenState extends State<LoginScreen> {
                 height: double.infinity,
                 child: SingleChildScrollView(
                   physics: AlwaysScrollableScrollPhysics(),
-                  padding: EdgeInsets.symmetric(
+                  padding: const EdgeInsets.symmetric(
                     horizontal: 40.0,
                     vertical: 120.0,
                   ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
+                      const Text(
                         "Sign In",
                         style: TextStyle(
                             color: Colors.white,
@@ -307,17 +341,18 @@ class _LoginScreenState extends State<LoginScreen> {
                       SizedBox(
                         height: 30.0,
                       ),
-                      _buildEmailTF(),
+                      _buildEmailTF(emailController),
                       SizedBox(
                         height: 30.0,
                       ),
-                      _buildPasswordTF(),
+                      _buildPasswordTF(passwordController),
                       _buildForgotPasswordBtn(),
                       _buildRememberMeCheckbox(),
                       _buildLoginBtn(),
                       _buildSignInWithText(),
                       _buildSocialBtnRow(),
-                      _buildSignUpBtn(),
+                      _buildSignUpBtn(emailController, passwordController,
+                          showSpinner, _auth),
                     ],
                   ),
                 ),

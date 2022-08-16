@@ -1,0 +1,47 @@
+{
+    "project_info": {
+      "project_number": "63938758635",
+      "project_id": "loginwithfirebase-bb630",
+      "storage_bucket": "loginwithfirebase-bb630.appspot.com"
+    },
+    "client": [
+      {
+        "client_info": {
+          "mobilesdk_app_id": "1:63938758635:android:af1a0c349ae9d2c5867bae",
+          "android_client_info": {
+            "package_name": "com.example.login_app"
+          }
+        },
+        "oauth_client": [
+          {
+            "client_id": "63938758635-ht3cd55pj3epp1jb6lorbar4ns3odqa8.apps.googleusercontent.com",
+            "client_type": 1,
+            "android_info": {
+              "package_name": "com.example.login_app",
+              "certificate_hash": "bf0192929457087002090fd1554149fd648e40a9"
+            }
+          },
+          {
+            "client_id": "63938758635-ik5fv6bnrp9nicuffeibp4v5rtqq3eak.apps.googleusercontent.com",
+            "client_type": 3
+          }
+        ],
+        "api_key": [
+          {
+            "current_key": "AIzaSyALGKiMEAogeRKMyyDDsWT7ejMXmyiCpew"
+          }
+        ],
+        "services": {
+          "appinvite_service": {
+            "other_platform_oauth_client": [
+              {
+                "client_id": "63938758635-ik5fv6bnrp9nicuffeibp4v5rtqq3eak.apps.googleusercontent.com",
+                "client_type": 3
+              }
+            ]
+          }
+        }
+      }
+    ],
+    "configuration_version": "1"
+  }  
